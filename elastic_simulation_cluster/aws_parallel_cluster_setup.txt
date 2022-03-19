@@ -1,0 +1,14 @@
+1. Please follow the instructions provided by AWS official documentation to install AWS ParallelCluster SDK first
+
+	https://docs.aws.amazon.com/parallelcluster/latest/ug/install-v3.html
+
+2. Create an IAM user with the two inline policies attached
+    a). CreateRoles4ParallelCluster
+    b). BaseUser4ParallelCluster
+
+3. Configure the awscli with the IAM user created in step 3
+
+4. Run the following command:
+
+	pcluster create-cluster --cluster-name [your cluster name] --cluster-configuration cluster-config.yaml
+
