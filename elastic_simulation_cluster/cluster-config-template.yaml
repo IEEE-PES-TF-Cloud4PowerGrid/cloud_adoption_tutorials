@@ -1,0 +1,65 @@
+# This is a template configuration file for parallel cluster,
+# please replace the value in <> the resources your AWS account can access
+
+Region: us-east-1
+Image:
+  Os: alinux2
+HeadNode:
+  InstanceType: t2.medium
+  Networking:
+    SubnetId: <your subnet ID>
+  Ssh:
+    KeyName: <your key pair name>
+  CustomActions:
+    OnNodeConfigured:
+      Script: https://raw.githubusercontent.com/hinfsynz/pes_tf_cloud4powergrid_tutorial/main/elastic_simulation_cluster/on-node-configured.sh
+      Args:
+        - https://github.com/aws-samples/aws-parallelcluster-monitoring/tarball/main
+        - aws-parallelcluster-monitoring
+        - install-monitoring.sh
+  Iam:
+    S3Access:
+      - BucketName: <your S3 bucket for the cluster>
+        EnableWriteAccess: false
+    AdditionalIamPolicies:
+      - Policy: arn:aws:iam::aws:policy/CloudWatchFullAccess
+      - Policy: arn:aws:iam::aws:policy/AWSPriceListServiceFullAccess
+      - Policy: arn:aws:iam::aws:policy/AmazonSSMFullAccess
+      - Policy: arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
+      - Policy: arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+  - Name: queue1
+    ComputeResources:
+    - Name: t3medium
+      InstanceType: t3.medium
+      MinCount: 0
+      MaxCount: 5
+    - Name: t3micro
+      InstanceType: t3.micro
+      MinCount: 0
+      MaxCount: 5
+    Networking:
+      SubnetIds:
+      - <your subnet ID, same as above>
+    CustomActions:
+      OnNodeConfigured:
+        Script: https://raw.githubusercontent.com/hinfsynz/pes_tf_cloud4powergrid_tutorial/main/elastic_simulation_cluster/on-node-configured.sh
+        Args:
+          - https://github.com/aws-samples/aws-parallelcluster-monitoring/tarball/main
+          - aws-parallelcluster-monitoring
+          - install-monitoring.sh
+    Iam:
+      S3Access:
+        - BucketName: <your S3 bucket for the cluster, same as above>
+          EnableWriteAccess: false
+      AdditionalIamPolicies:
+        - Policy: arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - Policy: arn:aws:iam::aws:policy/AWSPriceListServiceFullAccess
+        - Policy: arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - Policy: arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
+        - Policy: arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+Tags:
+  - Key: Application
+    Value: Grafana
