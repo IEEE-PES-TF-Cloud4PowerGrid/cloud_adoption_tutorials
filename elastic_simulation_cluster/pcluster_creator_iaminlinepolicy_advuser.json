@@ -1,0 +1,74 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AttachDetachPolicy",
+            "Effect": "Allow",
+            "Action": [
+                "iam:DetachRolePolicy",
+                "iam:AttachRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::<AWS ACCOUNT ID>:role/parallelcluster/*",
+            "Condition": {
+                "ArnLike": {
+                    "iam:PolicyARN": [
+                        "arn:aws:iam::<AWS ACCOUNT ID>:policy/parallelcluster*",
+                        "arn:aws:iam::<AWS ACCOUNT ID>:policy/parallelcluster/*",
+                        "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+                        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+                        "arn:aws:iam::aws:policy/AWSBatchFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+                        "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole",
+                        "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+                        "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+                        "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole",
+                        "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilder",
+                        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                        "arn:aws:iam::aws:policy/AWSPriceListServiceFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
+                        "arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess",
+                        "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "TagDeleteIamRole",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole",
+                "iam:TagRole",
+                "iam:DeleteRole"
+            ],
+            "Resource": "arn:aws:iam::<AWS ACCOUNT ID>:role/parallelcluster/*"
+        },
+        {
+            "Sid": "CreateIamRole",
+            "Effect": "Allow",
+            "Action": "iam:CreateRole",
+            "Resource": "arn:aws:iam::<AWS ACCOUNT ID>:role/parallelcluster/*"
+        },
+        {
+            "Sid": "PutDeletePolicy",
+            "Effect": "Allow",
+            "Action": [
+                "iam:DeleteRolePolicy",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::<AWS ACCOUNT ID>:role/parallelcluster/*"
+        },
+        {
+            "Sid": "GetAdditionalPolicy",
+            "Effect": "Allow",
+            "Action": "iam:GetPolicy",
+            "Resource": [
+                "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                "arn:aws:iam::aws:policy/AWSPriceListServiceFullAccess",
+                "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
+                "arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess",
+                "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+            ]
+        }
+    ]
+}
