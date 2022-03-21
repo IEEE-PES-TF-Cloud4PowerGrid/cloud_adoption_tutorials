@@ -2,9 +2,9 @@
 
 	https://docs.aws.amazon.com/parallelcluster/latest/ug/install-v3.html
 
-2. Create an IAM user with the two inline policies attached
-    a). CreateRoles4ParallelCluster
-    b). BaseUser4ParallelCluster
+2. Create an IAM user with the two inline policies attached using the two json files in this repo
+    a). CreateRoles4ParallelCluster (pcluster_creator_iaminlinepolicy_advuser.json)
+    b). BaseUser4ParallelCluster (pcluster_creator_iaminlinepolicy_baseuser.json)
 
 3. Configure the awscli with the IAM user created in step 3
 
