@@ -40,8 +40,8 @@
 	output = json
 	
 11. Run the following command:
-
+	sudo docker-compose --env-file /etc/parallelcluster/cfnconfig -f $HOME/aws-parallelcluster-monitoring/docker-compose/docker-compose.master.yml -p monitoring-master down
+	sudo docker-compose --env-file /etc/parallelcluster/cfnconfig -f $HOME/aws-parallelcluster-monitoring/docker-compose/docker-compose.master.yml -p monitoring-master up -d
 	sudo docker cp credentials grafana:/usr/share/grafana/.aws/
 	sudo docker cp config grafana:/usr/share/grafana/.aws/
-	sudo docker cp $HOME/aws-parallelcluster-monitoring/prometheus/prometheus.yml prometheus:/etc/prometheus/
 	
