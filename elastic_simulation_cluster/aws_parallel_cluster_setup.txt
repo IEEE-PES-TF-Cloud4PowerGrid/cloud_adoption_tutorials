@@ -6,7 +6,7 @@
     a). CreateRoles4ParallelCluster (pcluster_creator_iaminlinepolicy_advuser.json)
     b). BaseUser4ParallelCluster (pcluster_creator_iaminlinepolicy_baseuser.json)
 
-3. Configure the awscli with the IAM user created in step 3
+3. Configure the awscli with the IAM user created in step 2
 
 4. Modify the template config file "cluster-config-template.yaml" by following the in-file instructions and save it as "cluster-config.yaml"
 
@@ -14,3 +14,34 @@
 
 	pcluster create-cluster --cluster-name [any cluster name] --cluster-configuration cluster-config.yaml
 
+6. Use the following command to inspect the cluster status
+
+
+	plcuster describe-cluster --cluster-name [the cluster name]
+	
+7. When you see the cluster status becomes "CREATE_COMPLETE" (this may take a few minutes), use the following command to SSH into the cluster head node
+
+	pcluster ssh -i pcluster.pem --cluster-name [the cluster name]
+	
+8. Create an IAM user with only AWS managed policy "AmazonEC2ReadOnlyAccess" and "CloudWatchFullAccess" attached, download the access key pair
+
+9. Navigate to the path "$HOME/aws-parallelcluster-monitoring/prometheus/" on the head node, open the file "prometheus.yml", replace the <your AWS access key> and <your AWS secret key> with the values in the key file created in step 8
+
+10. Create a file named "credentials", and enter the following content (replace the string in the angle brackets, including the brackets with the values from the key file created in step 8):
+
+	[default]
+	aws_access_key_id=<your AWS access key>
+	aws_secret_access_key=<your AWS secret key>
+	
+11. Create a file named "config", and enter the following content (replace <your AWS Region> with correct value, e.g., us-east-1, us-west-2:
+
+	[default]
+	region = <your AWS Region>
+	output = json
+	
+11. Run the following command:
+
+	sudo docker cp credentials grafana:/usr/share/grafana/.aws/
+	sudo docker cp config grafana:/usr/share/grafana/.aws/
+	sudo docker cp $HOME/aws-parallelcluster-monitoring/prometheus/prometheus.yml prometheus:/etc/prometheus/
+	
