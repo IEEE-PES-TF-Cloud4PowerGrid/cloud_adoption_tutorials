@@ -14,7 +14,7 @@ HeadNode:
     OnNodeConfigured:
       Script: https://raw.githubusercontent.com/hinfsynz/pes_tf_cloud4powergrid_tutorial/main/elastic_simulation_cluster/on-node-configured.sh
       Args:
-        - https://github.com/aws-samples/aws-parallelcluster-monitoring/tarball/main
+        - https://github.com/hinfsynz/aws-parallelcluster-monitoring/tarball/main
         - aws-parallelcluster-monitoring
         - install-monitoring.sh
   Iam:
