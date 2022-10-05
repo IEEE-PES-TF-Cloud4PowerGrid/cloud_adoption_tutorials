@@ -45,3 +45,8 @@
 	sudo docker cp credentials grafana:/usr/share/grafana/.aws/
 	sudo docker cp config grafana:/usr/share/grafana/.aws/
 	
+12. when the cluster is up, go to "Network & Security"->"Security Groups" display, find the security group named "*HeadNodeSecurityGroup*", write down its group ID, e.g., "sg-01774f7001ec6c72d", add inbound rules using the following commands
+	aws ec2 authorize-security-group-ingress --group-id [your security group id] --protocol tcp --port 80 --cidr 0.0.0.0/0
+	aws ec2 authorize-security-group-ingress --group-id [your security group id] --protocol tcp --port 443 --cidr 0.0.0.0/0
+	
+now you can open the cluster home page by visiting the head node IP address.
