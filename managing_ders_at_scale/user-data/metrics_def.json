@@ -1,0 +1,19 @@
+{
+    "battery": {
+        "capacity": "float",
+        "power_output": "float",
+        "run_time": "float",
+        "cycle_life": "int",
+        "dischargable": "boolean"
+    },
+    "PV": {
+        "nominal_power": "float",
+        "power_output": "float",
+        "performance_ratio": "int"
+    },
+    "wind": {
+        "nameplate_capacity": "float",
+        "wind_speed": "float",
+        "power_output": "float"
+    }
+}

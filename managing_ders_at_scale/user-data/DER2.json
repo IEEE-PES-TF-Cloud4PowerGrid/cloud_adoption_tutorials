@@ -1,0 +1,18 @@
+{
+    "iot_things": {
+        "device_type":[
+            "battery", "PV", "wind"
+        ],
+        "device_number": {
+            "battery": 2,
+            "PV": 2,
+            "wind": 1
+        }
+    },
+    "greengrass_devices": {
+        "device_type": [ "wind" ],
+        "device_number": {
+            "wind": 1
+        }
+    }
+}

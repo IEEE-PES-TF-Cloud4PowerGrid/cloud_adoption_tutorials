@@ -1,0 +1,16 @@
+{
+    "component": {
+      "com.ipc.publish": {
+        "author": "songaws",
+        "version": "NEXT_PATCH",
+        "build": {
+          "build_system": "zip"
+        },
+        "publish": {
+          "bucket": "greengrass-component-artifacts",
+          "region": "us-east-1"
+        }
+      }
+    },
+    "gdk_version": "1.0.0"
+  }

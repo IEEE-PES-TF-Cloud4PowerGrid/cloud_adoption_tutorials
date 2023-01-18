@@ -1,0 +1,10 @@
+{
+    "device_type":[
+        "battery", "PV", "wind"
+    ],
+    "device_number": {
+        "battery": 2,
+        "PV": 2,
+        "wind": 1
+    }
+}
