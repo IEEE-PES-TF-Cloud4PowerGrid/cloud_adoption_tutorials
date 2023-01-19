@@ -1,7 +1,7 @@
 # Aggregating and Managing DERs at Scale through the Cloud
 
 ## Introduction
-This tutorial demonstrates a simplistic case of aggregating Distributed Energy Resources (DERs) and managing them at scale for wholesale electricity market bidding.
+This tutorial demonstrates a ***simplistic case*** of aggregating Distributed Energy Resources (DERs) and managing them at scale for wholesale electricity market bidding.
 
 The solution meets the following requirements
 * Connect to thousands of distributed energy resources (DERs)
