@@ -4,7 +4,7 @@
 This tutorial demonstrates a ***simplistic case*** of aggregating Distributed Energy Resources (DERs) and managing them at scale for wholesale electricity market bidding.
 
 The solution meets the following requirements
-* Connect to thousands of distributed energy resources (DERs)
+* Connect to distributed energy resources (DERs) at scale
 * Collect device measurements such as power output and run time every 5 min (minimum req: 5 min, most RT energy markets settle every 5 min)
 * Keep data for 5 year for auditing and forensic purpose
 * Analyze data via structured queries on-demand and periodically
