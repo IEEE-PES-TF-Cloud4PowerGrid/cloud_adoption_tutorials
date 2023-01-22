@@ -6,7 +6,7 @@ This tutorial demonstrates a ***simplistic case*** of aggregating Distributed En
 The solution meets the following requirements
 * Connect to heterogenous distributed energy resources (DERs) at scale
 * Collect device measurements such as power output and run time every 5 min (minimum req: 5 min, most RT energy markets settle every 5 min)
-* Keep data for 5 year for auditing and forensic purpose
+* Keep data for 5 years for auditing and forensic purpose
 * Analyze data via structured queries on-demand and periodically
 * Visualize data thru charts on dashboard
 * Identify the time slots when the aggregated capacity >= 100 kW (minimum size requirement for aggregation DERs in market participation)
@@ -68,7 +68,7 @@ To build the project, run the command below
 ```ini
 cdk synth
 ```
-To deploy the template that you synthesized with CDK synth on an AWS account. You need to install AWS CLI on the build machine and set up an AWS profile
+To deploy the template that you synthesized with CDK synth in an AWS account, run the following command. You may need to install AWS CLI on the build machine and set up an AWS profile
 ```ini
 cdk deploy
 ```
