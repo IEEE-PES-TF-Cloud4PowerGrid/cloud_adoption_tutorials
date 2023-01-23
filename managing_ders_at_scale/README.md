@@ -9,7 +9,7 @@ The solution meets the following requirements
 * Keep data for 5 year for auditing and forensic purpose
 * Analyze data via structured queries on-demand and periodically
 * Visualize data thru charts on dashboard
-* Identify the time slots when the aggregated capacity >= 100 kW (minimum size requirement for aggregation DERs in market participation)
+* Identify the time slots when the aggregated capacity >= 100 kW (minimum size requirement for aggregated DERs in market participation)
 * Keep the cost low
 * Anomaly detection and automatic notification
 * Back up data in a different geographic region
