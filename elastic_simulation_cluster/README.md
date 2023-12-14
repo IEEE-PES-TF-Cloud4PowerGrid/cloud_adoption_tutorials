@@ -7,8 +7,8 @@ This tutorial guides you through the deployment of an elastic HPC cluster on AWS
 1. Follow the instructions provided by [AWS official documentation](https://docs.aws.amazon.com/parallelcluster/latest/ug/install-v3.html) to install AWS ParallelCluster SDK first
 
 2. Create an IAM user with the two inline policies attached using the two json files in this repo
-    * CreateRoles4ParallelCluster [pcluster_creator_iaminlinepolicy_advuser.json](https://github.com/IEEE-PES-TF-Cloud4PowerGrid/tutorials/blob/main/elastic_simulation_cluster/pcluster_creator_iaminlinepolicy_advuser.json)
-    * BaseUser4ParallelCluster [pcluster_creator_iaminlinepolicy_baseuser.json](https://github.com/IEEE-PES-TF-Cloud4PowerGrid/tutorials/blob/main/elastic_simulation_cluster/pcluster_creator_iaminlinepolicy_baseuser.json)
+    * CreateRoles4ParallelCluster - use [pcluster_creator_iaminlinepolicy_advuser.json](https://github.com/IEEE-PES-TF-Cloud4PowerGrid/tutorials/blob/main/elastic_simulation_cluster/pcluster_creator_iaminlinepolicy_advuser.json)
+    * BaseUser4ParallelCluster - use [pcluster_creator_iaminlinepolicy_baseuser.json](https://github.com/IEEE-PES-TF-Cloud4PowerGrid/tutorials/blob/main/elastic_simulation_cluster/pcluster_creator_iaminlinepolicy_baseuser.json)
 
 3. Configure the awscli with the IAM user created in step 2
 
@@ -16,16 +16,21 @@ This tutorial guides you through the deployment of an elastic HPC cluster on AWS
 
 5. Run the following command:
 
-	```pcluster create-cluster --cluster-name [any cluster name] --cluster-configuration cluster-config.yaml
+	```
+    pcluster create-cluster --cluster-name [any cluster name] --cluster-configuration cluster-config.yaml
+    ```
 
 6. Use the following command to inspect the cluster status
 
-
-	```plcuster describe-cluster --cluster-name [the cluster name]
+	```
+    plcuster describe-cluster --cluster-name [the cluster name]
+    ```
 	
 7. When you see the cluster status becomes *CREATE_COMPLETE* (this may take a few minutes), use the following command to SSH into the cluster head node
 
-	```pcluster ssh -i pcluster.pem --cluster-name [the cluster name]
+	```
+    pcluster ssh -i pcluster.pem --cluster-name [the cluster name]
+    ```
 	
 8. Create an IAM user with only AWS managed policy "AmazonEC2ReadOnlyAccess" and "CloudWatchFullAccess" attached, download the access key pair
 
@@ -53,13 +58,13 @@ This tutorial guides you through the deployment of an elastic HPC cluster on AWS
 	sudo docker cp config grafana:/usr/share/grafana/.aws/
     ```
 	
-13. when the cluster is up, go to **"Network & Security"**, then **"Security Groups"** display, find the security group named *"HeadNodeSecurityGroup"*, write down its group ID, e.g., *"sg-01774f7001ec6c72d"*, add inbound rules using the following commands
+13. when the cluster is up, go to **Network & Security**, then **Security Groups** display, find the security group named *"HeadNodeSecurityGroup"*, write down its group ID, e.g., *"sg-01774f7001ec6c72d"*, add inbound rules using the following commands
     ```
 	aws ec2 authorize-security-group-ingress --group-id [your security group id] --protocol tcp --port 80 --cidr 0.0.0.0/0
 	aws ec2 authorize-security-group-ingress --group-id [your security group id] --protocol tcp --port 443 --cidr 0.0.0.0/0
     ```
 	
-Now you can open the cluster home page by visiting the head node public IPv4 address.
+Now you can open the cluster home page by visiting the head node public IPv4 address. You will see the cluster main page as shown below.
 
 ## Cluster Main Page
 ![Cluster main page](img/ClusterMainPage.png?raw=true "ParallelCluster for power grid simulation")
