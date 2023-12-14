@@ -1,7 +1,9 @@
 # Power Grid Simulator on Elastic HPC Cluster
 
 ## Introduction
-This tutorial guides you through the deployment of an elastic HPC cluster on AWS for power grid simulations using AWS ParallelCluster
+Power system engineers rely on workstations or on-prem clusters to run large-scale grid simulations. As the increased penetration of inverter-based renewable resources (IBRs) and generation interconnection, engineering applications must now consider many more variables and simulate more contingencies to fully evaluate grid reliability, resource adequacy as well as energy market rules. It can easily takes hours or even days to complete a multi-scenario steady state analysis (SSA) or time domain transient analysis.
+
+On-prem cluster has poor elasticity adapting to the bursting demand for engineering studies. Besides, it also creates system silos due to heavy customization and control, making it difficult to integrate other functionalities. This tutorial guides you through the deployment of an elastic HPC cluster on AWS for power grid simulations using AWS ParallelCluster.
 
 ## Deployment Step
 1. Follow the instructions provided by [AWS official documentation](https://docs.aws.amazon.com/parallelcluster/latest/ug/install-v3.html) to install AWS ParallelCluster SDK first
