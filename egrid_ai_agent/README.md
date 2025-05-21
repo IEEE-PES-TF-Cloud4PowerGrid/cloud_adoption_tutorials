@@ -72,14 +72,14 @@ python3 run_egrid_agent.py
 
 ## Expected Results
 ### Power Flow Analysis
-Uncomment the line in `run_egrid_agent` script where the prompt is "Run power flow analysis for case IEEE14_from_raw.gridcal" to run the power flow analysis example. Feel free to change the case name to play with various study systems. Note that you need to download the power flow cases from GridCal project repo ["Grids_and_Profiles/grids/"](https://github.com/SanPen/GridCal/tree/master/Grids_and_profiles) folder
+Uncomment the line in `run_egrid_agent` script where the prompt is *"Run power flow analysis for case IEEE14_from_raw.gridcal"* to run the power flow analysis example. Feel free to change the case name to play with various study systems. Note that you need to download the power flow cases from GridCal project repo ["Grids_and_Profiles/grids/"](https://github.com/SanPen/GridCal/tree/master/Grids_and_profiles) folder
 
 ![Agent Response PF](img/agent_resp_pf.png?raw=true "Agent Response for Prompt to Run Power Flow Analysis")
-*Agent Response for Prompt to Run Power Flow Analysis*
+<p align=center>Agent Response for Prompt to Run Power Flow Analysis</p>
 
 ### Hosting Capacity Analysis
 ![Agent Response HCA](img/agent_resp_hca.png?raw=true "Agent Response for Prompt to Run Hosting Capacity Analysis")
-*Agent Response for Prompt to Run Hosting Capacity Analysis*
+<p align=center>Agent Response for Prompt to Run Hosting Capacity Analysis</p>
 
 ![HCA Result](img/hca_res.png?raw=true "Visual Representation of Hosting Capacity Analysis Results")
-*Visual Representation of Hosting Capacity Analysis Results*
+<p align=center>Visual Representation of Hosting Capacity Analysis Results</p>
