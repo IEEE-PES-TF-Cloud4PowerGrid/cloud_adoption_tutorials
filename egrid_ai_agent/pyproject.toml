@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "egrid_ai_agent"
+dynamic = ["version"]
+description = "Power system analysis with AI agent capabilities"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+  {name = "Song Zhang", email = "song.zhang@ieee.org"},
+]
+dependencies = [
+    "requests",
+    "botocore",
+    "termcolor",
+    "InlineAgent",
+]
+
+#[tool.setuptools]
+#packages = ["egrid_ai_agent"]
+
+[project.urls]
+Repository = "https://github.com/IEEE-PES-TF-Cloud4PowerGrid/cloud_adoption_tutorials"
+
+[project.scripts]
+agent = "run_egrid_agent:main"
