@@ -1,13 +1,13 @@
 # eGRID AI AGENT
-<p align="center">
+AI agent for electric power grid analysis
+<p align="left">
   <a href="./README.md/#solution-overview"><img src="https://img.shields.io/badge/AWS-Agentic_AI-orange" /></a>
   <a href="./README.md/#setup-for-agent"><img src="https://img.shields.io/badge/Amazon-Bedrock_Inline_Agent-orange" /></a>
 </p>
 
-An AI agent for electric power grid analysis
 
 ## Introduction
-This is a sample agentic AI solution for function-calling various power system analysis tools through a RESTful service. The solution is built with [Amazon Bedrock Inline Agent SDK](https://github.com/awslabs/amazon-bedrock-agent-samples/tree/main/src/InlineAgent).
+This tutorial introduces a sample agentic AI solution for function-calling various power system analysis applications through a RESTful service. The solution is built with [Amazon Bedrock Inline Agent SDK](https://github.com/awslabs/amazon-bedrock-agent-samples/tree/main/src/InlineAgent). Open source software tools including [OpenDSS (DSS-Python)](https://github.com/dss-extensions/DSS-Python) and [GridCal](https://github.com/SanPen/GridCal) are used in this example to demonstrate the tool use process.
 
 ## Solution Overview
 ![soln_overview](img/soln_overview.png?raw=true "Architectural overview for the eGrid Agentic AI")
@@ -72,9 +72,14 @@ python3 run_egrid_agent.py
 
 ## Expected Results
 ### Power Flow Analysis
-Uncomment the line in `run_egrid_agent` script where the prompt is `Run power flow analysis for case IEEE14_from_raw.gridcal` to run the power flow analysis example. Note that you need to download the power flow case from GridCal project repo "Grids_and_Profiles/grids/" folder
+Uncomment the line in `run_egrid_agent` script where the prompt is "Run power flow analysis for case IEEE14_from_raw.gridcal" to run the power flow analysis example. Feel free to change the case name to play with various study systems. Note that you need to download the power flow cases from GridCal project repo ["Grids_and_Profiles/grids/"](https://github.com/SanPen/GridCal/tree/master/Grids_and_profiles) folder
+
 ![Agent Response PF](img/agent_resp_pf.png?raw=true "Agent Response for Prompt to Run Power Flow Analysis")
+*Agent Response for Prompt to Run Power Flow Analysis*
 
 ### Hosting Capacity Analysis
 ![Agent Response HCA](img/agent_resp_hca.png?raw=true "Agent Response for Prompt to Run Hosting Capacity Analysis")
+*Agent Response for Prompt to Run Hosting Capacity Analysis*
+
 ![HCA Result](img/hca_res.png?raw=true "Visual Representation of Hosting Capacity Analysis Results")
+*Visual Representation of Hosting Capacity Analysis Results*
