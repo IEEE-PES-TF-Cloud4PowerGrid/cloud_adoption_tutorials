@@ -19,6 +19,8 @@ FOUNDATION_MODELS = [
     "meta.llama4-scout-17b-instruct-v1:0"
 ]
 
+API_BASE_URL = "http://localhost:8000"  # if the MCP server is hosted remotely, use either public IP address or the DNS hostname instead
+
 class MCPHttpClient:
     def __init__(self, server_url, timeout: int = 30):
         self.server_url = server_url
@@ -262,7 +264,7 @@ class MCPHttpClient:
             await self.session.close()
 
 # Initialize remote MCP client
-mcp_client = MCPHttpClient("http://localhost:8000")
+mcp_client = MCPHttpClient(API_BASE_URL)
 
 async def remote_power_flow_tool(case_name: str) -> str:
     """

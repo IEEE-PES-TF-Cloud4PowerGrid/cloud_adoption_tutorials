@@ -2,8 +2,8 @@
 This is an MCP version of the eGrid Agentic AI example
 <p align="left">
   <a href="./README.md/#solution-overview"><img src="https://img.shields.io/badge/AWS-Agentic_AI-orange" /></a>
-  <a href="./README.md/#setup-for-agent"><img src="https://img.shields.io/badge/Amazon-Bedrock_Inline_Agent-orange" /></a>
-  <a href="./README.md/#setup-for-agent"><img src="https://img.shields.io/badge/MCP-FastMCP-blue" /></a>
+  <a href="./README.md/#setup-agent-for-mcp-client"><img src="https://img.shields.io/badge/Amazon-Bedrock_Inline_Agent-orange" /></a>
+  <a href="./README.md/#setup-for-egrid-analysis-mcp-server"><img src="https://img.shields.io/badge/MCP-FastMCP-blue" /></a>
 </p>
 
 
