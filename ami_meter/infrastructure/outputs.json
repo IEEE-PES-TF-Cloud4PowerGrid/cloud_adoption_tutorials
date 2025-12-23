@@ -1,0 +1,92 @@
+{
+  "api_sa_email": {
+    "sensitive": false,
+    "type": "string",
+    "value": "api-sa@driven-rider-449200-s1.iam.gserviceaccount.com"
+  },
+  "bq_dataset_full_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "driven-rider-449200-s1:smart_grid_analytics"
+  },
+  "bq_dataset_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "smart_grid_analytics"
+  },
+  "bq_raw_table_full_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "driven-rider-449200-s1:smart_grid_analytics.raw_meter_readings"
+  },
+  "bq_raw_table_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "raw_meter_readings"
+  },
+  "dataflow_artifacts_bucket": {
+    "sensitive": false,
+    "type": "string",
+    "value": "driven-rider-449200-s1-ami-dataflow-artifacts"
+  },
+  "dataflow_artifacts_bucket_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "gs://driven-rider-449200-s1-ami-dataflow-artifacts"
+  },
+  "dataflow_launch_command": {
+    "sensitive": false,
+    "type": "string",
+    "value": "python -m cloud_processing.streaming_pipeline \\\n  --runner DataflowRunner \\\n  --project=driven-rider-449200-s1 \\\n  --region=us-central1 \\\n  --input_subscription=projects/driven-rider-449200-s1/subscriptions/ami-meter-data-sub \\\n  --output_bq_table=driven-rider-449200-s1:smart_grid_analytics.raw_meter_readings \\\n  --raw_archive_bucket=driven-rider-449200-s1-ami-raw-archive \\\n  --temp_location=gs://driven-rider-449200-s1-ami-dataflow-artifacts/temp \\\n  --staging_location=gs://driven-rider-449200-s1-ami-dataflow-artifacts/staging \\\n  --service_account_email=dataflow-sa@driven-rider-449200-s1.iam.gserviceaccount.com \\\n  --worker_machine_type=e2-standard-2 \\\n  --max_num_workers=2 \\\n  --streaming\n"
+  },
+  "dataflow_sa_email": {
+    "sensitive": false,
+    "type": "string",
+    "value": "dataflow-sa@driven-rider-449200-s1.iam.gserviceaccount.com"
+  },
+  "edge_device_sa_email": {
+    "sensitive": false,
+    "type": "string",
+    "value": "edge-device-sa@driven-rider-449200-s1.iam.gserviceaccount.com"
+  },
+  "edge_simulator_env": {
+    "sensitive": false,
+    "type": "string",
+    "value": "export GOOGLE_CLOUD_PROJECT=driven-rider-449200-s1\nexport PUBSUB_TOPIC=ami-meter-data\nexport GOOGLE_APPLICATION_CREDENTIALS=path/to/edge-device-sa-key.json\n"
+  },
+  "pubsub_dlq_topic_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ami-meter-data-dlq"
+  },
+  "pubsub_subscription_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "projects/driven-rider-449200-s1/subscriptions/ami-meter-data-sub"
+  },
+  "pubsub_subscription_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ami-meter-data-sub"
+  },
+  "pubsub_topic_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "projects/driven-rider-449200-s1/topics/ami-meter-data"
+  },
+  "pubsub_topic_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ami-meter-data"
+  },
+  "raw_archive_bucket": {
+    "sensitive": false,
+    "type": "string",
+    "value": "driven-rider-449200-s1-ami-raw-archive"
+  },
+  "raw_archive_bucket_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "gs://driven-rider-449200-s1-ami-raw-archive"
+  }
+}

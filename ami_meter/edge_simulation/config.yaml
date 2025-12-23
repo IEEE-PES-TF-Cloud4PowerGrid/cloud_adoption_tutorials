@@ -1,0 +1,98 @@
+# Edge Simulation Configuration for AMI 2.0 Smart Meter Demo
+# This config defines parameters for the meter simulator and gateway relay
+
+# Pole/Gateway Configuration
+pole:
+  pole_id: "pole_A"
+  num_meters: 10
+  meter_id_prefix: "m"
+
+# Sampling Configuration
+sampling:
+  sample_hz: 1  # Readings per second (1 Hz = seconds-level)
+  batch_size: 10  # Number of readings per batch (0 = no batching)
+
+# Publishing Mode
+publish:
+  mode: "single"  # Options: "single" (one msg per reading) or "batch"
+  pubsub_topic: "ami-meter-data"  # Pub/Sub topic name (project from env)
+
+# Network Backhaul Profile
+network:
+  profile: "5g"  # Options: "wired", "5g", "lte_m", "satellite"
+  profiles:
+    wired:
+      latency_ms_min: 5
+      latency_ms_max: 30
+      jitter_ms: 10
+      drop_prob: 0.0001
+      reorder_prob: 0.0001
+    5g:
+      latency_ms_min: 20
+      latency_ms_max: 200
+      jitter_ms: 50
+      drop_prob: 0.001
+      reorder_prob: 0.001
+    lte_m:
+      latency_ms_min: 50
+      latency_ms_max: 300
+      jitter_ms: 100
+      drop_prob: 0.005
+      reorder_prob: 0.002
+    satellite:
+      latency_ms_min: 300
+      latency_ms_max: 900
+      jitter_ms: 200
+      drop_prob: 0.01
+      reorder_prob: 0.005
+
+# Electrical Parameters
+electrical:
+  # Voltage Model
+  voltage:
+    nominal_v: 240.0  # Nominal RMS voltage
+    noise_std: 3.0    # Gaussian noise standard deviation
+    sag_threshold: 220.0  # Voltage below this is considered a sag
+    swell_threshold: 260.0  # Voltage above this is considered a swell
+    # Sag events configuration
+    sag_probability: 0.001  # Probability of starting a sag event per second
+    sag_depth_min: 10.0    # Minimum voltage drop during sag (V)
+    sag_depth_max: 30.0    # Maximum voltage drop during sag (V)
+    sag_duration_min: 3    # Minimum sag duration (seconds)
+    sag_duration_max: 15   # Maximum sag duration (seconds)
+
+  # Power Model - Daily Load Curve
+  power:
+    base_load_kw: 0.5  # Baseline power consumption
+    peak_morning_kw: 2.5  # Morning peak (6-9 AM)
+    peak_evening_kw: 4.0  # Evening peak (5-9 PM)
+    midday_kw: 1.0  # Midday consumption
+    night_kw: 0.4  # Night consumption
+    noise_factor: 0.15  # Random variation factor (0-1)
+    # Per-meter variation
+    meter_factor_min: 0.7
+    meter_factor_max: 1.5
+
+  # Reactive Power
+  reactive:
+    power_factor_min: 0.85
+    power_factor_max: 0.99
+    power_factor_default: 0.95
+
+  # Frequency
+  frequency:
+    nominal_hz: 60.0
+    variation_hz: 0.05  # Small random variation
+
+# Logging Configuration
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  log_interval_seconds: 10  # Log statistics every N seconds
+  stdout_events: false  # Print each event to stdout (for debugging)
+
+# Demo Mode
+demo:
+  # Force a voltage sag event every N seconds (for demo purposes)
+  force_sag_interval_seconds: 60
+  # Duration of demo run (0 = infinite)
+  duration_seconds: 0

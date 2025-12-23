@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: ami-streaming-pipeline
+Version: 1.0.0
+Summary: AMI 2.0 Smart Meter Streaming Pipeline
+Author: IEEE PES TF Cloud4PowerGrid
+Requires-Python: >=3.9

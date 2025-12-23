@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/IEEE-PES-TF-Cloud4PowerGrid/ami-telemetry",
+  "title": "AMI 2.0 Telemetry Event",
+  "description": "Schema for seconds-level AMI 2.0 smart meter telemetry",
+  "type": "object",
+  "required": [
+    "event_ts",
+    "meter_id",
+    "pole_id",
+    "seq",
+    "voltage_v",
+    "current_a",
+    "power_kw"
+  ],
+  "properties": {
+    "event_ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event timestamp in RFC3339 UTC format"
+    },
+    "meter_id": {
+      "type": "string",
+      "description": "Unique meter identifier",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "pole_id": {
+      "type": "string",
+      "description": "Pole/gateway identifier",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonically increasing sequence number per meter"
+    },
+    "voltage_v": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 500,
+      "description": "RMS voltage in volts"
+    },
+    "current_a": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 200,
+      "description": "RMS current in amperes"
+    },
+    "power_kw": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 50,
+      "description": "Active power in kilowatts"
+    },
+    "reactive_kvar": {
+      "type": ["number", "null"],
+      "description": "Reactive power in kVAR"
+    },
+    "freq_hz": {
+      "type": ["number", "null"],
+      "minimum": 45,
+      "maximum": 65,
+      "description": "System frequency in Hz"
+    },
+    "quality_flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["estimated", "missing", "out_of_range", "voltage_sag", "voltage_swell"]
+      },
+      "description": "Data quality flags"
+    },
+    "network_profile": {
+      "type": ["string", "null"],
+      "enum": ["wired", "5g", "lte_m", "satellite", null],
+      "description": "Network backhaul type"
+    }
+  },
+  "additionalProperties": false
+}

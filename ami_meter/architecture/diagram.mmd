@@ -1,0 +1,102 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4285F4', 'secondaryColor': '#34A853', 'tertiaryColor': '#FBBC05'}}}%%
+flowchart TB
+    subgraph Edge["Edge Layer (Power Poles)"]
+        direction TB
+        M1[("AMI 2.0 Meter 1<br/>1Hz Sampling")]
+        M2[("AMI 2.0 Meter 2<br/>1Hz Sampling")]
+        M3[("AMI 2.0 Meter N<br/>1Hz Sampling")]
+        SIM["simulator.py<br/>Synthetic Data Generator"]
+        GW["gateway_relay.py<br/>Pole Gateway"]
+        
+        M1 --> SIM
+        M2 --> SIM
+        M3 --> SIM
+        SIM --> GW
+    end
+    
+    subgraph Backhaul["Network Backhaul"]
+        direction LR
+        NET["5G / Satellite / Wired<br/>(Simulated Jitter & Latency)"]
+    end
+    
+    subgraph Ingestion["Cloud Ingestion Layer"]
+        direction TB
+        TOPIC["Pub/Sub Topic<br/>ami-meter-data"]
+        SUB["Pub/Sub Subscription<br/>ami-meter-data-sub"]
+        DLQ["Dead Letter Queue<br/>(Optional)"]
+        
+        TOPIC --> SUB
+        TOPIC --> DLQ
+    end
+    
+    subgraph Processing["Stream Processing Layer"]
+        direction TB
+        DF["Dataflow Pipeline<br/>(Apache Beam)"]
+        PARSE["Parse & Validate<br/>JSON"]
+        ENRICH["Enrich with<br/>Ingest Timestamp"]
+        
+        DF --> PARSE
+        PARSE --> ENRICH
+    end
+    
+    subgraph Storage["Storage Layer"]
+        direction TB
+        GCS["Cloud Storage<br/>Raw Archive (JSONL/CSV)"]
+        BQ["BigQuery<br/>smart_grid_analytics"]
+        RAW["raw_meter_readings<br/>(Partitioned by Day)"]
+        AGG["Aggregated Views<br/>(5-min, Hourly)"]
+        
+        BQ --> RAW
+        BQ --> AGG
+    end
+    
+    subgraph Analytics["Analytics Layer"]
+        direction TB
+        VOLT["Voltage Anomaly<br/>Detection"]
+        DR["DR Baseline<br/>Computation"]
+        HEALTH["Feeder Health<br/>Summary"]
+        SCHED["Cloud Scheduler<br/>(Periodic Jobs)"]
+        
+        SCHED --> VOLT
+        SCHED --> DR
+        SCHED --> HEALTH
+    end
+    
+    subgraph API["Serving Layer"]
+        direction TB
+        RUN["Cloud Run API<br/>(FastAPI)"]
+        ENDPOINTS["Endpoints:<br/>/health<br/>/pole/{id}/summary<br/>/anomalies<br/>/dr/compute"]
+        
+        RUN --> ENDPOINTS
+    end
+    
+    %% Connections
+    GW --> NET
+    NET --> TOPIC
+    SUB --> DF
+    ENRICH --> GCS
+    ENRICH --> BQ
+    RAW --> VOLT
+    RAW --> DR
+    RAW --> HEALTH
+    AGG --> RUN
+    RAW --> RUN
+    
+    %% Styling
+    classDef meter fill:#E8F5E9,stroke:#2E7D32
+    classDef gateway fill:#E3F2FD,stroke:#1565C0
+    classDef network fill:#FFF3E0,stroke:#E65100
+    classDef pubsub fill:#FCE4EC,stroke:#AD1457
+    classDef dataflow fill:#F3E5F5,stroke:#7B1FA2
+    classDef storage fill:#E1F5FE,stroke:#0277BD
+    classDef analytics fill:#FFF8E1,stroke:#FF8F00
+    classDef api fill:#E8EAF6,stroke:#3F51B5
+    
+    class M1,M2,M3 meter
+    class SIM,GW gateway
+    class NET network
+    class TOPIC,SUB,DLQ pubsub
+    class DF,PARSE,ENRICH dataflow
+    class GCS,BQ,RAW,AGG storage
+    class VOLT,DR,HEALTH,SCHED analytics
+    class RUN,ENDPOINTS api
