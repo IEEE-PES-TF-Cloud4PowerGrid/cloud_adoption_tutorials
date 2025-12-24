@@ -1,16 +1,16 @@
-# Next-Gen AMI 2.0 Smart Meter Analytics on Google Cloud
+# Next-Gen Smart Meter Data Analytics on Google Cloud
 
 [![IEEE PES](https://img.shields.io/badge/IEEE%20PES-Cloud4PowerGrid-blue)](https://github.com/IEEE-PES-TF-Cloud4PowerGrid/cloud_adoption_tutorials)
 [![GCP](https://img.shields.io/badge/Google%20Cloud-Platform-orange)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 
-This tutorial demonstrates a cloud-native architecture for ingesting, storing, and analyzing high-frequency data from **second-generation Advanced Metering Infrastructure (AMI 2.0)** smart meters using **Google Cloud Platform** services.
+This tutorial demonstrates a cloud-native architecture for ingesting, storing, and analyzing high-frequency data from **Advanced Metering Infrastructure (AMI)** smart meters using **Google Cloud Platform** services.
 
 ## 🎯 Overview
 
-AMI 2.0 represents a significant evolution from legacy smart meters:
+AMI represents a significant evolution from legacy smart meters:
 
-| Feature | Legacy AMI | AMI 2.0 |
+| Feature | Legacy Smart Meter | AMI |
 |---------|-----------|---------|
 | Sampling Rate | 5-60 minutes | **1 second** (or faster) |
 | Data per Meter/Day | ~288-1,440 readings | **86,400 readings** |
@@ -27,7 +27,7 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           AMI 2.0 Smart Meter Analytics                      │
+│                            Smart Meter Data Analytics                      │
 └─────────────────────────────────────────────────────────────────────────────┘
 
   ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
@@ -35,7 +35,7 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
   │   (Power Poles)  │     │                  │     │                      │
   │                  │     │                  │     │                      │
   │  ┌────────────┐  │     │  ┌────────────┐  │     │  ┌────────────────┐  │
-  │  │ AMI 2.0    │──┼──5G──┼──│  Pub/Sub   │──┼─────┼──│   Dataflow     │  │
+  │  │ AMI    │──┼──5G──┼──│  Pub/Sub   │──┼─────┼──│   Dataflow     │  │
   │  │ Meters     │  │  /   │  │  Topic     │  │     │  │   Pipeline     │  │
   │  │ (1Hz data) │  │ Sat  │  └────────────┘  │     │  └───────┬────────┘  │
   │  └────────────┘  │     │                  │     │          │           │
@@ -338,11 +338,12 @@ ami_meter/
 
 | Service | Usage | Est. Cost/Hour |
 |---------|-------|----------------|
+| VM | 2c/8G | ~$1.00 |
 | Pub/Sub | 10 msg/s | ~$0.01 |
 | Dataflow | 2 workers | ~$0.20 |
 | BigQuery | Storage + queries | ~$0.01 |
 | Cloud Storage | 1 GB | ~$0.01 |
-| **Total** | | **~$0.25/hour** |
+| **Total** | | **~$1.25/hour** |
 
 ### Cost Control Tips
 
@@ -414,6 +415,8 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](../LIC
 ## 🤝 Contributing
 
 Contributions are welcome! Please see the main repository's contributing guidelines.
+
+The preparation of this tutorial is with help of multiple GenAI tools.
 
 ---
 
