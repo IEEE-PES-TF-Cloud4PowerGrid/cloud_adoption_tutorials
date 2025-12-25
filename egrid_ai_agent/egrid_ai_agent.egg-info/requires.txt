@@ -1,0 +1,4 @@
+requests
+botocore
+termcolor
+InlineAgent

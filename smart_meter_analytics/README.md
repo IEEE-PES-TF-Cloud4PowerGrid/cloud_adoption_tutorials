@@ -27,7 +27,7 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                            Smart Meter Data Analytics                      │
+│                            Smart Meter Data Analytics                       │
 └─────────────────────────────────────────────────────────────────────────────┘
 
   ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
@@ -35,9 +35,9 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
   │   (Power Poles)  │     │                  │     │                      │
   │                  │     │                  │     │                      │
   │  ┌────────────┐  │     │  ┌────────────┐  │     │  ┌────────────────┐  │
-  │  │ AMI    │──┼──5G──┼──│  Pub/Sub   │──┼─────┼──│   Dataflow     │  │
-  │  │ Meters     │  │  /   │  │  Topic     │  │     │  │   Pipeline     │  │
-  │  │ (1Hz data) │  │ Sat  │  └────────────┘  │     │  └───────┬────────┘  │
+  │  │ AMI        │──┼──5G─┼──│  Pub/Sub   │──┼──┼──┼──│   Dataflow     │  │
+  │  │ Meters     │  │  /  │  │  Topic     │  │     │  │   Pipeline     │  │
+  │  │ (1Hz data) │  │ Sat │  └────────────┘  │     │  └───────┬────────┘  │
   │  └────────────┘  │     │                  │     │          │           │
   │        │         │     │  ┌────────────┐  │     │          ▼           │
   │        ▼         │     │  │   Dead     │  │     │  ┌───────────────┐   │
@@ -54,7 +54,7 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
                │   Cloud Storage   │              │    BigQuery       │      │
                │   (Raw Archive)   │              │    (Analytics)    │      │
                │                   │              │                   │      │
-               │  gs://bucket/raw/ │              │  raw_meter_readings│      │
+               │  gs://bucket/raw/ │              │ raw_meter_readings│      │
                │  ├── pole_A/      │              │  (partitioned)    │      │
                │  └── pole_B/      │              │                   │      │
                └───────────────────┘              └─────────┬─────────┘      │
@@ -135,7 +135,7 @@ gcloud auth application-default login
 ### Step 1: Deploy Infrastructure
 
 ```bash
-cd ami_meter/infrastructure
+cd smart_meter_analytics/infrastructure
 
 # Initialize Terraform
 terraform init
@@ -162,7 +162,7 @@ This creates:
 In a new terminal:
 
 ```bash
-cd ami_meter
+cd smart_meter_analytics
 
 # Install dependencies
 pip install -r edge_simulation/requirements.txt
@@ -183,7 +183,7 @@ python edge_simulation/gateway_relay.py \
 ### Step 3: Launch Dataflow Pipeline
 
 ```bash
-cd ami_meter
+cd smart_meter_analytics
 
 # Install dependencies
 pip install -r cloud_processing/requirements.txt
@@ -244,7 +244,7 @@ GROUP BY pole_id
 ### Step 6: Deploy API (Optional)
 
 ```bash
-cd ami_meter/services/api
+cd smart_meter_analytics/services/api
 
 # Build and deploy to Cloud Run
 gcloud run deploy ami-analytics-api \
@@ -268,7 +268,7 @@ curl https://ami-analytics-api-XXX.run.app/anomalies
 ## 📁 Project Structure
 
 ```
-ami_meter/
+smart_meter_analytics/
 ├── README.md                    # This file
 ├── architecture/
 │   ├── diagram.mmd              # Mermaid architecture diagram
@@ -338,12 +338,14 @@ ami_meter/
 
 | Service | Usage | Est. Cost/Hour |
 |---------|-------|----------------|
-| VM | 2c/8G | ~$1.00 |
+| VM | 2c/8G | ~$0.07 |
 | Pub/Sub | 10 msg/s | ~$0.01 |
 | Dataflow | 2 workers | ~$0.20 |
 | BigQuery | Storage + queries | ~$0.01 |
 | Cloud Storage | 1 GB | ~$0.01 |
-| **Total** | | **~$1.25/hour** |
+| **Total** | | **~$0.30/hour** |
+
+**Note:** The cost is a rough estimation of running the tutorial locally. Cost might be slightly higher if running the tutorial on GCP, which requires another VM instance.
 
 ### Cost Control Tips
 

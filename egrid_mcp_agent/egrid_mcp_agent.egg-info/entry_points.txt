@@ -1,0 +1,2 @@
+[console_scripts]
+agent = run_egrid_agent_mcp_client:main
