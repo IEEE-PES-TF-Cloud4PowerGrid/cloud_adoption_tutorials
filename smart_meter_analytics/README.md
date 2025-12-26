@@ -8,18 +8,19 @@ This tutorial demonstrates a cloud-native architecture for ingesting, storing, a
 
 ## 🎯 Overview
 
-AMI represents a significant evolution from legacy smart meters:
+AMI 2.0 represents a significant evolution from legacy smart meters, enabling utilities to collect data at much higher frequencies for real-time grid monitoring and advanced analytics:
 
-| Feature | Legacy Smart Meter | AMI |
+| Feature | Legacy Smart Meter | AMI 2.0 |
 |---------|-----------|---------|
-| Sampling Rate | 5-60 minutes | **1 second** (or faster) |
-| Data per Meter/Day | ~288-1,440 readings | **86,400 readings** |
+| Sampling Rate | 15-60 minutes | **30 seconds - 15 minutes** |
+| Data per Meter/Day | ~24-96 readings | **96 - 2,880 readings** |
 | Primary Use Cases | Billing, basic analysis | Real-time monitoring, DR, anomaly detection |
-| Data Volume | Baseline | **50 million times more** |
+| Data Volume | Baseline | **6-30x more data** |
+| Latency | Batch (daily/hourly) | Near real-time (minutes) |
 
-This tutorial implements a realistic end-to-end pipeline that handles this high-frequency data, enabling:
+This tutorial implements a realistic end-to-end pipeline with configurable sampling rates and a **real-time monitoring dashboard**, enabling:
 
-- **Real-time grid monitoring** - Detect voltage anomalies within seconds
+- **Real-time grid monitoring** - Detect voltage anomalies within minutes via Cloud Monitoring dashboard
 - **Demand Response (DR)** - Compute accurate baselines for DR programs
 - **Non-intrusive load monitoring** - Analyze consumption patterns without additional sensors
 
@@ -35,9 +36,9 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
   │   (Power Poles)  │     │                  │     │                      │
   │                  │     │                  │     │                      │
   │  ┌────────────┐  │     │  ┌────────────┐  │     │  ┌────────────────┐  │
-  │  │ AMI        │──┼──5G─┼──│  Pub/Sub   │──┼──┼──┼──│   Dataflow     │  │
+  │  │ AMI 2.0    │──┼──5G─┼──│  Pub/Sub   │──┼──┼──┼──│   Dataflow     │  │
   │  │ Meters     │  │  /  │  │  Topic     │  │     │  │   Pipeline     │  │
-  │  │ (1Hz data) │  │ Sat │  └────────────┘  │     │  └───────┬────────┘  │
+  │  │(30s-15min) │  │ Sat │  └────────────┘  │     │  └───────┬────────┘  │
   │  └────────────┘  │     │                  │     │          │           │
   │        │         │     │  ┌────────────┐  │     │          ▼           │
   │        ▼         │     │  │   Dead     │  │     │  ┌───────────────┐   │
@@ -78,13 +79,14 @@ This tutorial implements a realistic end-to-end pipeline that handles this high-
 
 | Component | Service | Purpose |
 |-----------|---------|---------|
-| **Edge Simulation** | Python + VM | Generates realistic 1Hz meter data |
+| **Edge Simulation** | Python + VM | Generates realistic AMI 2.0 meter data (30s-15min intervals) |
 | **Gateway Relay** | Python | Simulates network backhaul (5G/satellite/wired) |
 | **Ingestion** | Pub/Sub | Decouples producers/consumers, handles bursts |
 | **Processing** | Dataflow | Streaming ETL with validation |
 | **Raw Archive** | Cloud Storage | Durable JSON/CSV data lake |
 | **Analytics** | BigQuery | Partitioned tables for fast queries |
 | **API** | Cloud Run | On-demand analytics endpoints |
+| **Dashboard** | Cloud Monitoring | Real-time metrics visualization |
 
 ## 📋 Prerequisites
 
@@ -288,6 +290,7 @@ smart_meter_analytics/
 ├── cloud_processing/
 │   ├── streaming_pipeline.py    # Dataflow pipeline
 │   ├── transforms.py            # Beam transforms
+│   ├── metrics_publisher.py     # Cloud Monitoring integration
 │   ├── setup.py                 # Package setup
 │   └── requirements.txt
 ├── analytics/
@@ -317,11 +320,20 @@ smart_meter_analytics/
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `pole.num_meters` | 10 | Meters per pole |
-| `sampling.sample_hz` | 1 | Readings per second |
+| `sampling.sample_interval_seconds` | 30 | Interval between readings in seconds |
+| `sampling.preset` | "high_frequency" | Preset: high_frequency (30s), standard (5min), low_frequency (15min) |
 | `network.profile` | "5g" | Backhaul simulation (wired/5g/satellite) |
 | `electrical.voltage.nominal_v` | 240 | Nominal voltage |
 | `electrical.voltage.sag_threshold` | 220 | Voltage sag threshold |
-| `demo.force_sag_interval_seconds` | 60 | Force sag events for demo |
+| `demo.force_sag_every_n_intervals` | 10 | Force sag events every N intervals |
+
+### Sampling Rate Presets
+
+| Preset | Interval | Readings/Day/Meter | Use Case |
+|--------|----------|-------------------|----------|
+| `high_frequency` | 30 seconds | 2,880 | Real-time voltage monitoring |
+| `standard` | 5 minutes | 288 | Typical utility deployment |
+| `low_frequency` | 15 minutes | 96 | Bandwidth-constrained areas |
 
 ### Network Profiles
 
@@ -332,6 +344,42 @@ smart_meter_analytics/
 | lte_m | 50-300ms | ±100ms | 0.5% |
 | satellite | 300-900ms | ±200ms | 1.0% |
 
+## 📊 Real-Time Dashboard
+
+This tutorial includes a **Google Cloud Monitoring dashboard** for real-time visualization of AMI data:
+
+### Dashboard Features
+
+- **Total Messages Ingested** - Pub/Sub throughput metrics
+- **Pub/Sub Backlog** - Message queue depth with thresholds
+- **Dataflow Processing Lag** - Pipeline latency monitoring
+- **Average Voltage by Pole** - Real-time voltage with sag threshold lines
+- **Total Power Consumption** - Aggregated power by pole
+- **Voltage Sag Events** - Count of anomalies detected
+- **Meter Health Score** - Overall grid health indicator (0-100%)
+- **Active Meters** - Count of reporting meters
+
+### Accessing the Dashboard
+
+After deploying infrastructure with Terraform:
+
+1. Navigate to [Cloud Monitoring](https://console.cloud.google.com/monitoring) in GCP Console
+2. Go to **Dashboards** in the left menu
+3. Find **"AMI 2.0 Smart Meter Real-Time Dashboard"**
+
+### Enabling Metrics in Pipeline
+
+To publish custom metrics to the dashboard, add the `--enable_monitoring_metrics` flag when launching the pipeline:
+
+```bash
+python cloud_processing/streaming_pipeline.py \
+    --runner DataflowRunner \
+    --project YOUR_PROJECT_ID \
+    --enable_monitoring_metrics \
+    --metrics_window_seconds 60 \
+    # ... other options
+```
+
 ## 💰 Cost Considerations
 
 ### Estimated Costs (Tutorial Scale)
@@ -339,11 +387,12 @@ smart_meter_analytics/
 | Service | Usage | Est. Cost/Hour |
 |---------|-------|----------------|
 | VM | 2c/8G | ~$0.07 |
-| Pub/Sub | 10 msg/s | ~$0.01 |
+| Pub/Sub | 2-20 msg/min | ~$0.01 |
 | Dataflow | 2 workers | ~$0.20 |
 | BigQuery | Storage + queries | ~$0.01 |
 | Cloud Storage | 1 GB | ~$0.01 |
-| **Total** | | **~$0.30/hour** |
+| Cloud Monitoring | Custom metrics | ~$0.01 |
+| **Total** | | **~$0.31/hour** |
 
 **Note:** The cost is a rough estimation of running the tutorial locally. Cost might be slightly higher if running the tutorial on GCP, which requires another VM instance.
 

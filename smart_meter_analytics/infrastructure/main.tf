@@ -368,3 +368,464 @@ resource "local_file" "edge_device_key_file" {
   filename        = "${path.module}/keys/edge-device-sa-key.json"
   file_permission = "0600"
 }
+
+# -----------------------------------------------------------------------------
+# Cloud Monitoring Dashboard
+# -----------------------------------------------------------------------------
+
+resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
+  dashboard_json = jsonencode({
+    displayName = "AMI 2.0 Smart Meter Real-Time Dashboard"
+    labels = {
+      environment = "demo"
+    }
+    mosaicLayout = {
+      columns = 12
+      tiles = [
+        # Row 1: Key Metrics Overview
+        {
+          width  = 4
+          height = 4
+          widget = {
+            title = "Total Messages Ingested"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "resource.type=\"pubsub_subscription\" AND resource.labels.subscription_id=\"${var.pubsub_subscription_name}\" AND metric.type=\"pubsub.googleapis.com/subscription/num_delivered_messages\""
+                  aggregation = {
+                    alignmentPeriod    = "60s"
+                    perSeriesAligner   = "ALIGN_RATE"
+                    crossSeriesReducer = "REDUCE_SUM"
+                  }
+                }
+              }
+              sparkChartView = {
+                sparkChartType = "SPARK_LINE"
+              }
+            }
+          }
+        },
+        {
+          xPos   = 4
+          width  = 4
+          height = 4
+          widget = {
+            title = "Pub/Sub Backlog"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "resource.type=\"pubsub_subscription\" AND resource.labels.subscription_id=\"${var.pubsub_subscription_name}\" AND metric.type=\"pubsub.googleapis.com/subscription/num_undelivered_messages\""
+                  aggregation = {
+                    alignmentPeriod  = "60s"
+                    perSeriesAligner = "ALIGN_MEAN"
+                  }
+                }
+              }
+              thresholds = [
+                {
+                  color     = "YELLOW"
+                  direction = "ABOVE"
+                  value     = 100
+                },
+                {
+                  color     = "RED"
+                  direction = "ABOVE"
+                  value     = 1000
+                }
+              ]
+            }
+          }
+        },
+        {
+          xPos   = 8
+          width  = 4
+          height = 4
+          widget = {
+            title = "Dataflow Processing Lag"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "resource.type=\"dataflow_job\" AND metric.type=\"dataflow.googleapis.com/job/system_lag\""
+                  aggregation = {
+                    alignmentPeriod  = "60s"
+                    perSeriesAligner = "ALIGN_MAX"
+                  }
+                }
+              }
+              thresholds = [
+                {
+                  color     = "YELLOW"
+                  direction = "ABOVE"
+                  value     = 30
+                },
+                {
+                  color     = "RED"
+                  direction = "ABOVE"
+                  value     = 120
+                }
+              ]
+            }
+          }
+        },
+        # Row 2: Custom AMI Metrics
+        {
+          yPos   = 4
+          width  = 6
+          height = 4
+          widget = {
+            title = "Average Voltage by Pole"
+            xyChart = {
+              dataSets = [
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "metric.type=\"custom.googleapis.com/ami/voltage_avg\""
+                      aggregation = {
+                        alignmentPeriod  = "60s"
+                        perSeriesAligner = "ALIGN_MEAN"
+                      }
+                    }
+                  }
+                  plotType = "LINE"
+                }
+              ]
+              yAxis = {
+                label = "Voltage (V)"
+                scale = "LINEAR"
+              }
+              thresholds = [
+                {
+                  label     = "Sag Threshold"
+                  value     = 220
+                  color     = "YELLOW"
+                },
+                {
+                  label     = "Nominal"
+                  value     = 240
+                  color     = "BLUE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          yPos   = 4
+          xPos   = 6
+          width  = 6
+          height = 4
+          widget = {
+            title = "Total Power Consumption (kW)"
+            xyChart = {
+              dataSets = [
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "metric.type=\"custom.googleapis.com/ami/power_total_kw\""
+                      aggregation = {
+                        alignmentPeriod  = "60s"
+                        perSeriesAligner = "ALIGN_MEAN"
+                      }
+                    }
+                  }
+                  plotType = "STACKED_AREA"
+                }
+              ]
+              yAxis = {
+                label = "Power (kW)"
+                scale = "LINEAR"
+              }
+            }
+          }
+        },
+        # Row 3: Anomaly and Health Metrics
+        {
+          yPos   = 8
+          width  = 4
+          height = 4
+          widget = {
+            title = "Voltage Sag Events (5 min)"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "metric.type=\"custom.googleapis.com/ami/voltage_sag_count\""
+                  aggregation = {
+                    alignmentPeriod    = "300s"
+                    perSeriesAligner   = "ALIGN_SUM"
+                    crossSeriesReducer = "REDUCE_SUM"
+                  }
+                }
+              }
+              thresholds = [
+                {
+                  color     = "YELLOW"
+                  direction = "ABOVE"
+                  value     = 5
+                },
+                {
+                  color     = "RED"
+                  direction = "ABOVE"
+                  value     = 20
+                }
+              ]
+            }
+          }
+        },
+        {
+          yPos   = 8
+          xPos   = 4
+          width  = 4
+          height = 4
+          widget = {
+            title = "Meter Health Score"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "metric.type=\"custom.googleapis.com/ami/health_score\""
+                  aggregation = {
+                    alignmentPeriod    = "60s"
+                    perSeriesAligner   = "ALIGN_MEAN"
+                    crossSeriesReducer = "REDUCE_MEAN"
+                  }
+                }
+              }
+              thresholds = [
+                {
+                  color     = "RED"
+                  direction = "BELOW"
+                  value     = 80
+                },
+                {
+                  color     = "YELLOW"
+                  direction = "BELOW"
+                  value     = 95
+                }
+              ]
+            }
+          }
+        },
+        {
+          yPos   = 8
+          xPos   = 8
+          width  = 4
+          height = 4
+          widget = {
+            title = "Active Meters"
+            scorecard = {
+              timeSeriesQuery = {
+                timeSeriesFilter = {
+                  filter = "metric.type=\"custom.googleapis.com/ami/active_meter_count\""
+                  aggregation = {
+                    alignmentPeriod    = "60s"
+                    perSeriesAligner   = "ALIGN_MEAN"
+                    crossSeriesReducer = "REDUCE_SUM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        # Row 4: Detailed Charts
+        {
+          yPos   = 12
+          width  = 6
+          height = 5
+          widget = {
+            title = "Voltage Distribution (Min/Avg/Max)"
+            xyChart = {
+              dataSets = [
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "metric.type=\"custom.googleapis.com/ami/voltage_min\""
+                      aggregation = {
+                        alignmentPeriod  = "60s"
+                        perSeriesAligner = "ALIGN_MIN"
+                      }
+                    }
+                  }
+                  legendTemplate = "Min Voltage"
+                  plotType       = "LINE"
+                },
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "metric.type=\"custom.googleapis.com/ami/voltage_avg\""
+                      aggregation = {
+                        alignmentPeriod  = "60s"
+                        perSeriesAligner = "ALIGN_MEAN"
+                      }
+                    }
+                  }
+                  legendTemplate = "Avg Voltage"
+                  plotType       = "LINE"
+                },
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "metric.type=\"custom.googleapis.com/ami/voltage_max\""
+                      aggregation = {
+                        alignmentPeriod  = "60s"
+                        perSeriesAligner = "ALIGN_MAX"
+                      }
+                    }
+                  }
+                  legendTemplate = "Max Voltage"
+                  plotType       = "LINE"
+                }
+              ]
+              yAxis = {
+                label = "Voltage (V)"
+                scale = "LINEAR"
+              }
+            }
+          }
+        },
+        {
+          yPos   = 12
+          xPos   = 6
+          width  = 6
+          height = 5
+          widget = {
+            title = "BigQuery Streaming Inserts"
+            xyChart = {
+              dataSets = [
+                {
+                  timeSeriesQuery = {
+                    timeSeriesFilter = {
+                      filter = "resource.type=\"bigquery_dataset\" AND metric.type=\"bigquery.googleapis.com/storage/streaming_insert_count\""
+                      aggregation = {
+                        alignmentPeriod    = "60s"
+                        perSeriesAligner   = "ALIGN_RATE"
+                        crossSeriesReducer = "REDUCE_SUM"
+                      }
+                    }
+                  }
+                  plotType = "LINE"
+                }
+              ]
+              yAxis = {
+                label = "Inserts/sec"
+                scale = "LINEAR"
+              }
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  project = var.project_id
+}
+
+# Custom Metric Descriptors for AMI data
+resource "google_monitoring_metric_descriptor" "voltage_avg" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/voltage_avg"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Average Voltage"
+  description  = "Average RMS voltage across meters at a pole"
+  unit         = "V"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "voltage_min" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/voltage_min"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Minimum Voltage"
+  description  = "Minimum RMS voltage at a pole"
+  unit         = "V"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "voltage_max" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/voltage_max"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Maximum Voltage"
+  description  = "Maximum RMS voltage at a pole"
+  unit         = "V"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "power_total" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/power_total_kw"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Total Power"
+  description  = "Total active power consumption at a pole"
+  unit         = "kW"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "voltage_sag_count" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/voltage_sag_count"
+  metric_kind  = "GAUGE"
+  value_type   = "INT64"
+  display_name = "Voltage Sag Count"
+  description  = "Number of voltage sag events detected"
+  unit         = "1"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "health_score" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/health_score"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Health Score"
+  description  = "Overall health score (0-100) based on voltage quality"
+  unit         = "%"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "active_meter_count" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/active_meter_count"
+  metric_kind  = "GAUGE"
+  value_type   = "INT64"
+  display_name = "Active Meter Count"
+  description  = "Number of active meters at a pole"
+  unit         = "1"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}

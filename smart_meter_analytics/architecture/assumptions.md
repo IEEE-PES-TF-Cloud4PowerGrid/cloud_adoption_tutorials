@@ -6,12 +6,25 @@ This document defines the data model, scaling assumptions, and configuration par
 
 ## AMI 2.0 vs. Legacy AMI Comparison
 
+AMI 2.0 represents a significant upgrade from legacy smart meters, enabling utilities to collect data at much higher frequencies. While legacy meters typically report at 15-60 minute intervals (primarily for billing), AMI 2.0 can deliver data at intervals ranging from **30 seconds to 15 minutes**, enabling real-time grid monitoring and advanced analytics.
+
 | Parameter | Legacy AMI | AMI 2.0 |
 |-----------|-----------|---------|
-| Sampling Interval | 5-60 minutes | 1 second (or faster) |
-| Data per meter/day | ~288-1,440 readings | 86,400 readings |
-| Primary Use Case | Billing, basic load analysis | Real-time grid monitoring, DR, anomaly detection |
-| Data Volume Multiplier | 1x (baseline) | 50M x (vs 15-min intervals) |
+| Sampling Interval | 15-60 minutes | **30 seconds - 15 minutes** |
+| Data per meter/day | ~24-96 readings | **96 - 2,880 readings** |
+| Primary Use Case | Billing, basic load analysis | Real-time monitoring, DR, anomaly detection |
+| Data Volume Multiplier | 1x (baseline) | **6x - 30x** (vs 15-min legacy) |
+| Latency | Batch (daily/hourly) | Near real-time (minutes) |
+
+### AMI 2.0 Sampling Rate Configurations
+
+This tutorial supports three sampling presets that reflect real-world AMI 2.0 deployments:
+
+| Preset | Interval | Readings/Day/Meter | Use Case |
+|--------|----------|-------------------|----------|
+| `high_frequency` | 30 seconds | 2,880 | Real-time voltage monitoring, fast DR response |
+| `standard` | 5 minutes | 288 | Typical utility deployment, balanced cost/insight |
+| `low_frequency` | 15 minutes | 96 | Bandwidth-constrained areas, basic analytics |
 
 ## Data Model
 
@@ -65,9 +78,17 @@ Each telemetry message represents a single point-in-time measurement from one me
 |-----------|-------|-------|
 | Meters per pole | 10 | Typical residential pole |
 | Poles per simulation | 1-5 | Tutorial scale |
-| Sampling rate | 1 Hz | One reading per second |
-| Messages per second | 10-50 | Tutorial throughput |
+| Sampling interval | 30 seconds | High-frequency preset |
+| Messages per minute | 20-100 | Tutorial throughput |
 | Data retention | 7 days | Tutorial storage |
+
+### Sampling Presets
+
+| Preset | Interval | Msgs/min (10 meters) | Daily Data (1 pole) |
+|--------|----------|----------------------|---------------------|
+| high_frequency | 30s | 20 | ~4 MB |
+| standard | 5 min | 2 | ~0.4 MB |
+| low_frequency | 15 min | 0.67 | ~0.13 MB |
 
 ### Production-Scale Reference
 
@@ -76,8 +97,8 @@ Each telemetry message represents a single point-in-time measurement from one me
 | Meters per pole | 10-50 | Varies by deployment |
 | Poles per region | 1,000-100,000 | Medium utility |
 | Total meters | 100,000-5,000,000 | Range of utility sizes |
-| Messages per second | 100K-5M | At 1 Hz sampling |
-| Daily data volume | 100 GB - 5 TB | Depending on scale |
+| Messages per minute | 10K-1M | At 30s-5min sampling |
+| Daily data volume | 1 GB - 50 GB | Depending on scale & interval |
 
 ## Electrical Parameters
 

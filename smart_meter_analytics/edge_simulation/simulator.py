@@ -54,7 +54,8 @@ class SimulatorConfig:
     pole_id: str
     num_meters: int
     meter_id_prefix: str
-    sample_hz: float
+    sample_interval_seconds: float  # Interval between readings (e.g., 30, 300, 900)
+    sample_hz: float  # Deprecated: kept for backward compatibility
     
     # Voltage parameters
     voltage_nominal: float
@@ -103,11 +104,30 @@ class SimulatorConfig:
         demo = config_dict.get('demo', {})
         logging_conf = config_dict.get('logging', {})
         
+        # Handle sampling interval with preset support
+        preset = sampling.get('preset', 'high_frequency')
+        preset_intervals = {
+            'high_frequency': 30,     # 30 seconds
+            'standard': 300,          # 5 minutes  
+            'low_frequency': 900,     # 15 minutes
+        }
+        
+        # Priority: explicit sample_interval_seconds > preset > sample_hz (deprecated)
+        sample_interval = sampling.get('sample_interval_seconds')
+        if sample_interval is None:
+            sample_interval = preset_intervals.get(preset, 30)
+        
+        # Backward compatibility: convert sample_hz if provided
+        sample_hz = sampling.get('sample_hz')
+        if sample_hz and sample_interval is None:
+            sample_interval = 1.0 / sample_hz
+        
         return cls(
             pole_id=pole.get('pole_id', 'pole_A'),
             num_meters=pole.get('num_meters', 10),
             meter_id_prefix=pole.get('meter_id_prefix', 'm'),
-            sample_hz=sampling.get('sample_hz', 1),
+            sample_interval_seconds=sample_interval,
+            sample_hz=1.0 / sample_interval if sample_interval > 0 else 1.0,
             voltage_nominal=voltage.get('nominal_v', 240.0),
             voltage_noise_std=voltage.get('noise_std', 3.0),
             sag_threshold=voltage.get('sag_threshold', 220.0),
@@ -174,7 +194,11 @@ class MeterSimulator:
             ))
         
         self._last_force_sag_time = time.time()
-        logger.info(f"Initialized simulator with {len(self.meters)} meters on pole {config.pole_id}")
+        self._readings_since_sag = 0  # Counter for interval-based sag triggering
+        logger.info(
+            f"Initialized simulator with {len(self.meters)} meters on pole {config.pole_id}, "
+            f"interval={config.sample_interval_seconds}s"
+        )
     
     def _get_load_curve_factor(self, hour: float) -> float:
         """
@@ -382,11 +406,11 @@ class MeterSimulator:
         Yields:
             Individual meter readings
         """
-        interval = 1.0 / self.config.sample_hz
+        interval = self.config.sample_interval_seconds
         start_time = time.time()
         reading_count = 0
         
-        logger.info(f"Starting simulation at {self.config.sample_hz} Hz")
+        logger.info(f"Starting simulation with {interval}s interval ({60/interval:.2f} readings/min per meter)")
         
         try:
             while True:

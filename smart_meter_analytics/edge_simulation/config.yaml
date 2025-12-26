@@ -8,9 +8,17 @@ pole:
   meter_id_prefix: "m"
 
 # Sampling Configuration
+# AMI 2.0 typically sends data every 5-15 minutes, with faster rates up to 30 seconds
+# Note: sample_interval_seconds replaces sample_hz for more intuitive configuration
 sampling:
-  sample_hz: 1  # Readings per second (1 Hz = seconds-level)
+  sample_interval_seconds: 30  # Interval between readings (30s, 60s, 300s=5min, 900s=15min)
+  sample_hz: null  # Deprecated: Use sample_interval_seconds instead
   batch_size: 10  # Number of readings per batch (0 = no batching)
+  # Preset configurations:
+  #   "high_frequency": 30 seconds (for real-time monitoring scenarios)
+  #   "standard": 300 seconds (5 minutes - common AMI 2.0 deployment)
+  #   "low_frequency": 900 seconds (15 minutes - bandwidth-constrained)
+  preset: "high_frequency"  # Options: high_frequency, standard, low_frequency
 
 # Publishing Mode
 publish:
@@ -92,7 +100,11 @@ logging:
 
 # Demo Mode
 demo:
-  # Force a voltage sag event every N seconds (for demo purposes)
-  force_sag_interval_seconds: 60
+  # Force a voltage sag event every N intervals (for demo purposes)
+  # With 30s intervals, force_sag_interval=10 means a sag every ~5 minutes
+  force_sag_every_n_intervals: 10
+  force_sag_interval_seconds: 300  # Legacy: force sag every N seconds
   # Duration of demo run (0 = infinite)
   duration_seconds: 0
+  # Quick demo mode: runs faster for testing
+  accelerated_mode: false

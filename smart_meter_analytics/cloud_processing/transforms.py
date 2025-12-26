@@ -340,3 +340,54 @@ class AggregateByWindow(beam.PTransform):
             | 'Aggregate' >> beam.Map(aggregate_readings)
             | 'FilterNone' >> beam.Filter(lambda x: x is not None)
         )
+
+
+class PublishMonitoringMetricsFn(beam.DoFn):
+    """
+    Publish aggregated metrics to Google Cloud Monitoring.
+    
+    This DoFn receives grouped readings by pole_id and publishes
+    custom metrics for real-time dashboard visualization.
+    """
+    
+    def __init__(self, project_id: str):
+        """
+        Initialize with GCP project ID.
+        
+        Args:
+            project_id: GCP project ID for Cloud Monitoring
+        """
+        self.project_id = project_id
+        self.publisher = None
+    
+    def setup(self):
+        """Initialize the metrics publisher (called once per worker)."""
+        try:
+            from metrics_publisher import MetricsPublisher
+            self.publisher = MetricsPublisher(self.project_id)
+            logger.info(f"Initialized Cloud Monitoring publisher for {self.project_id}")
+        except Exception as e:
+            logger.error(f"Failed to initialize metrics publisher: {e}")
+            self.publisher = None
+    
+    def process(self, element):
+        """
+        Process grouped readings and publish metrics.
+        
+        Args:
+            element: Tuple of (pole_id, iterable of readings)
+        """
+        if self.publisher is None:
+            return
+        
+        pole_id, readings_iter = element
+        readings = list(readings_iter)
+        
+        if not readings:
+            return
+        
+        try:
+            self.publisher.publish_pole_metrics(pole_id, readings)
+            logger.debug(f"Published metrics for pole {pole_id} ({len(readings)} readings)")
+        except Exception as e:
+            logger.error(f"Error publishing metrics for pole {pole_id}: {e}")
