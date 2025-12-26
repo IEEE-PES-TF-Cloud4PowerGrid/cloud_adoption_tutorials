@@ -96,11 +96,13 @@ class MetricsPublisher:
         # Create the data point
         point = monitoring_v3.Point()
         
-        # Set timestamp
+        # Set timestamp using protobuf Timestamp
+        from google.protobuf import timestamp_pb2
         seconds = int(timestamp.timestamp())
         nanos = int((timestamp.timestamp() - seconds) * 1e9)
-        point.interval.end_time.seconds = seconds
-        point.interval.end_time.nanos = nanos
+        
+        end_time = timestamp_pb2.Timestamp(seconds=seconds, nanos=nanos)
+        point.interval.end_time = end_time
         
         # Set value
         if value_type == 'int64':

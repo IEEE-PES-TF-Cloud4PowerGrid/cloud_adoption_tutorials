@@ -497,12 +497,10 @@ resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
                 {
                   label     = "Sag Threshold"
                   value     = 220
-                  color     = "YELLOW"
                 },
                 {
                   label     = "Nominal"
                   value     = 240
-                  color     = "BLUE"
                 }
               ]
             }

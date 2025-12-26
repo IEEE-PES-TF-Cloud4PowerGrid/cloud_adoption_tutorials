@@ -29,14 +29,25 @@ from apache_beam.options.pipeline_options import PipelineOptions, StandardOption
 from apache_beam.transforms.window import FixedWindows
 from apache_beam.transforms.trigger import AfterWatermark, AfterProcessingTime, AccumulationMode
 
-from transforms import (
-    BQ_SCHEMA,
-    ParseJsonFn,
-    ValidateRecordFn,
-    EnrichRecordFn,
-    FormatForGcsFn,
-    FormatErrorFn,
-)
+# Handle both direct execution and module import
+try:
+    from transforms import (
+        BQ_SCHEMA,
+        ParseJsonFn,
+        ValidateRecordFn,
+        EnrichRecordFn,
+        FormatForGcsFn,
+        FormatErrorFn,
+    )
+except ImportError:
+    from cloud_processing.transforms import (
+        BQ_SCHEMA,
+        ParseJsonFn,
+        ValidateRecordFn,
+        EnrichRecordFn,
+        FormatForGcsFn,
+        FormatErrorFn,
+    )
 
 # Configure logging
 logging.basicConfig(
