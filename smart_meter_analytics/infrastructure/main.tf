@@ -387,14 +387,14 @@ resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
           width  = 4
           height = 4
           widget = {
-            title = "Total Messages Ingested"
+            title = "Messages Processed"
             scorecard = {
               timeSeriesQuery = {
                 timeSeriesFilter = {
-                  filter = "resource.type=\"pubsub_subscription\" AND resource.labels.subscription_id=\"${var.pubsub_subscription_name}\" AND metric.type=\"pubsub.googleapis.com/subscription/num_delivered_messages\""
+                  filter = "metric.type=\"custom.googleapis.com/ami/messages_processed\""
                   aggregation = {
                     alignmentPeriod    = "60s"
-                    perSeriesAligner   = "ALIGN_RATE"
+                    perSeriesAligner   = "ALIGN_MAX"
                     crossSeriesReducer = "REDUCE_SUM"
                   }
                 }
@@ -441,11 +441,11 @@ resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
           width  = 4
           height = 4
           widget = {
-            title = "Dataflow Processing Lag"
+            title = "Processing Lag (seconds)"
             scorecard = {
               timeSeriesQuery = {
                 timeSeriesFilter = {
-                  filter = "resource.type=\"dataflow_job\" AND metric.type=\"dataflow.googleapis.com/job/system_lag\""
+                  filter = "metric.type=\"custom.googleapis.com/ami/processing_lag_seconds\""
                   aggregation = {
                     alignmentPeriod  = "60s"
                     perSeriesAligner = "ALIGN_MAX"
@@ -684,16 +684,16 @@ resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
           width  = 6
           height = 5
           widget = {
-            title = "BigQuery Streaming Inserts"
+            title = "Records Written to BigQuery"
             xyChart = {
               dataSets = [
                 {
                   timeSeriesQuery = {
                     timeSeriesFilter = {
-                      filter = "resource.type=\"bigquery_dataset\" AND metric.type=\"bigquery.googleapis.com/storage/streaming_insert_count\""
+                      filter = "metric.type=\"custom.googleapis.com/ami/records_written\""
                       aggregation = {
                         alignmentPeriod    = "60s"
-                        perSeriesAligner   = "ALIGN_RATE"
+                        perSeriesAligner   = "ALIGN_MAX"
                         crossSeriesReducer = "REDUCE_SUM"
                       }
                     }
@@ -702,7 +702,7 @@ resource "google_monitoring_dashboard" "ami_realtime_dashboard" {
                 }
               ]
               yAxis = {
-                label = "Inserts/sec"
+                label = "Records"
                 scale = "LINEAR"
               }
             }
@@ -819,6 +819,55 @@ resource "google_monitoring_metric_descriptor" "active_meter_count" {
   value_type   = "INT64"
   display_name = "Active Meter Count"
   description  = "Number of active meters at a pole"
+  unit         = "1"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+# Additional metrics for pipeline monitoring
+resource "google_monitoring_metric_descriptor" "messages_processed" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/messages_processed"
+  metric_kind  = "GAUGE"
+  value_type   = "INT64"
+  display_name = "Messages Processed"
+  description  = "Total number of messages processed by the pipeline"
+  unit         = "1"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "processing_lag_seconds" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/processing_lag_seconds"
+  metric_kind  = "GAUGE"
+  value_type   = "DOUBLE"
+  display_name = "Processing Lag"
+  description  = "Time lag between event generation and processing in seconds"
+  unit         = "s"
+  
+  labels {
+    key         = "pole_id"
+    value_type  = "STRING"
+    description = "Pole/gateway identifier"
+  }
+}
+
+resource "google_monitoring_metric_descriptor" "records_written" {
+  project      = var.project_id
+  type         = "custom.googleapis.com/ami/records_written"
+  metric_kind  = "GAUGE"
+  value_type   = "INT64"
+  display_name = "Records Written"
+  description  = "Number of records written to BigQuery"
   unit         = "1"
   
   labels {

@@ -380,6 +380,12 @@ python cloud_processing/streaming_pipeline.py \
     # ... other options
 ```
 
+### Dashboard example
+
+![Dashboard Overview](img/dashboard1.png)
+
+![Dashboard Metrics](img/dashboard2.png)
+
 ## 💰 Cost Considerations
 
 ### Estimated Costs (Tutorial Scale)

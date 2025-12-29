@@ -54,6 +54,9 @@ class MetricsPublisher:
             'voltage_sag_count': f"{self.CUSTOM_METRIC_PREFIX}/voltage_sag_count",
             'health_score': f"{self.CUSTOM_METRIC_PREFIX}/health_score",
             'active_meter_count': f"{self.CUSTOM_METRIC_PREFIX}/active_meter_count",
+            'messages_processed': f"{self.CUSTOM_METRIC_PREFIX}/messages_processed",
+            'processing_lag_seconds': f"{self.CUSTOM_METRIC_PREFIX}/processing_lag_seconds",
+            'records_written': f"{self.CUSTOM_METRIC_PREFIX}/records_written",
         }
         
         logger.info(f"Initialized MetricsPublisher for project {project_id}")
@@ -224,6 +227,69 @@ class MetricsPublisher:
             
         except Exception as e:
             logger.error(f"Error publishing metrics for pole {pole_id}: {e}")
+            return False
+    
+    def publish_pipeline_metrics(
+        self,
+        pole_id: str,
+        messages_processed: int,
+        processing_lag_seconds: float,
+        records_written: int,
+        timestamp: Optional[datetime] = None
+    ) -> bool:
+        """
+        Publish pipeline performance metrics.
+        
+        Args:
+            pole_id: Pole identifier
+            messages_processed: Total messages processed
+            processing_lag_seconds: Average processing lag
+            records_written: Number of records written to BigQuery
+            timestamp: Metric timestamp (defaults to now)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            if timestamp is None:
+                timestamp = datetime.now(timezone.utc)
+            
+            labels = {'pole_id': pole_id}
+            
+            time_series_list = [
+                self._create_time_series(
+                    self.metric_types['messages_processed'],
+                    messages_processed,
+                    labels,
+                    timestamp,
+                    value_type='int64'
+                ),
+                self._create_time_series(
+                    self.metric_types['processing_lag_seconds'],
+                    processing_lag_seconds,
+                    labels,
+                    timestamp
+                ),
+                self._create_time_series(
+                    self.metric_types['records_written'],
+                    records_written,
+                    labels,
+                    timestamp,
+                    value_type='int64'
+                ),
+            ]
+            
+            request = monitoring_v3.CreateTimeSeriesRequest(
+                name=self.project_name,
+                time_series=time_series_list
+            )
+            self.client.create_time_series(request=request)
+            
+            logger.debug(f"Published pipeline metrics for pole {pole_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error publishing pipeline metrics: {e}")
             return False
     
     def publish_batch(
