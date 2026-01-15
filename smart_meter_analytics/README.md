@@ -24,6 +24,10 @@ This tutorial implements a realistic end-to-end pipeline with configurable sampl
 - **Demand Response (DR)** - Compute accurate baselines for DR programs
 - **Non-intrusive load monitoring** - Analyze consumption patterns without additional sensors
 
+![Dashboard Overview](img/dashboard1.png)
+
+![Dashboard Metrics](img/dashboard2.png)
+
 ## 🏗️ Architecture
 
 ```
@@ -379,12 +383,6 @@ python cloud_processing/streaming_pipeline.py \
     --metrics_window_seconds 60 \
     # ... other options
 ```
-
-### Dashboard example
-
-![Dashboard Overview](img/dashboard1.png)
-
-![Dashboard Metrics](img/dashboard2.png)
 
 ## 💰 Cost Considerations
 
